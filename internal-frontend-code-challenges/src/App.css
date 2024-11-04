@@ -1,0 +1,30 @@
+pre {
+  padding: 1rem;
+}
+
+/* styles for loader */
+
+[aria-busy='true']:not(input, select, textarea, html)::before {
+  font-size: 2rem;
+}
+
+[aria-busy='true']:not(input, select, textarea, html):empty {
+  box-shadow: none !important;
+}
+
+main.container {
+  padding-top: 1rem;
+}
+
+button {
+  /* --pico-form-element-spacing-vertical: 0.4rem; */
+}
+
+.footer-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}

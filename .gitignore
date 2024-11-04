@@ -1,0 +1,108 @@
+# Flutter/Dart/Pub related
+programmingquizz/.dart_tool/
+programmingquizz/.flutter-plugins
+programmingquizz/.flutter-plugins-dependencies
+programmingquizz/.packages
+programmingquizz/.pub-cache/
+programmingquizz/.pub/
+programmingquizz/.melos_tool/
+
+# Web related
+programmingquizz/web/.sass-cache/
+programmingquizz/web/.dart_tool/
+
+# iOS related
+programmingquizz/ios/Flutter/Flutter.framework
+programmingquizz/ios/Flutter/Flutter.podspec
+programmingquizz/ios/.symlinks/
+programmingquizz/ios/Pods/
+programmingquizz/ios/Runner.xcworkspace/
+programmingquizz/ios/build/
+programmingquizz/ios/Podfile.lock
+
+# Xcode files
+programmingquizz/xcuserdata/
+programmingquizz/*.xcscmblueprint
+programmingquizz/*.xcodeproj/xcuserdata/
+programmingquizz/*.xcodeproj/project.xcworkspace/xcuserdata/
+programmingquizz/DerivedData/
+programmingquizz/.idea/
+
+# Android related
+programmingquizz/android/.gradle/
+programmingquizz/android/app/debug/
+programmingquizz/android/app/release/
+programmingquizz/android/local.properties
+programmingquizz/android/.idea
+programmingquizz/android/build/
+
+# VS Code
+programmingquizz/.vscode/
+programmingquizz/.vscode/settings.json
+programmingquizz/.vscode/launch.json
+programmingquizz/.vscode/tasks.json
+
+# IntelliJ related
+programmingquizz/*.iml
+programmingquizz/.idea/
+programmingquizz/*.ipr
+programmingquizz/*.iws
+programmingquizz/.idea/modules.xml
+programmingquizz/.idea/*.iml
+programmingquizz/.idea/workspace.xml
+programmingquizz/.idea/libraries
+
+# Windows related
+programmingquizz/windows/flutter/ephemeral/
+programmingquizz/windows/build/
+
+# Linux related
+programmingquizz/linux/flutter/ephemeral/
+programmingquizz/linux/build/
+
+# MacOS related
+programmingquizz/macos/Flutter/ephemeral/
+programmingquizz/macos/build/
+
+# Flutter environment-specific files
+programmingquizz/.env
+programmingquizz/.env.*
+
+# Generated Plugin registrants
+programmingquizz/**/GeneratedPluginRegistrant.*
+
+# Google Service config files (optional, if you're using Firebase)
+programmingquizz/ios/Runner/GoogleService-Info.plist
+programmingquizz/android/app/google-services.json
+
+# JetBrains IDEs
+programmingquizz/.idea/
+programmingquizz/*.iml
+programmingquizz/*.ipr
+programmingquizz/*.iws
+programmingquizz/.idea/modules.xml
+programmingquizz/.idea/workspace.xml
+programmingquizz/.idea/libraries
+
+# Node.js related
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.npmrc
+
+# React/Frontend related
+**/dist/
+**/.env.local
+**/.env.development
+**/.env.production
+**/.env.test
+**/.eslintcache
+**/coverage/
+
+# Miscellaneous
+programmingquizz/*.log
+programmingquizz/*.tmp
+programmingquizz/.DS_Store
+
