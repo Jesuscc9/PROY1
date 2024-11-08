@@ -1,0 +1,23 @@
+{
+  'version': 0,
+  'use-external-names': 'false',
+  'case-sensitive': 'false',
+  'roots': [{
+    'type': 'directory',
+    'name': "/Users/jesuscervantescastro/Desktop/programming/PROY1/programmingquizz/build/macos/Build/Products/Release/app_links/app_links.framework/Modules"
+    'contents': [{
+      'type': 'file',
+      'name': "module.modulemap",
+      'external-contents': "/Users/jesuscervantescastro/Desktop/programming/PROY1/programmingquizz/build/macos/Build/Intermediates.noindex/Pods.build/Release/app_links.build/unextended-module.modulemap",
+    }]
+    },
+    {
+    'type': 'directory',
+    'name': "/Users/jesuscervantescastro/Desktop/programming/PROY1/programmingquizz/build/macos/Build/Products/Release/app_links/app_links.framework/Headers"
+    'contents': [{
+      'type': 'file',
+      'name': "app_links-Swift.h",
+      'external-contents': "/Users/jesuscervantescastro/Desktop/programming/PROY1/programmingquizz/build/macos/Build/Intermediates.noindex/Pods.build/Release/app_links.build/unextended-interface-header.h",
+    }]
+    }]
+}

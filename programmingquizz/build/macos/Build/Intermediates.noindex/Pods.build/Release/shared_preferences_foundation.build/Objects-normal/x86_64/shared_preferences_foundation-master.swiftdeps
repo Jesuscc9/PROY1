@@ -1,0 +1,9 @@
+version: "Apple Swift version 5.9 (swiftlang-5.9.0.128.108 clang-1500.0.40.1)"
+options: "cabdbbc52bd982119c303b6538a833f5be51830530cf4c767d3dc302dd164e9f"
+build_start_time: [1730690347, 402412000]
+build_end_time: [1730690355, 824062000]
+inputs:
+  ? "/Users/jesuscervantescastro/.pub-cache/hosted/pub.dev/shared_preferences_foundation-2.5.3/darwin/shared_preferences_foundation/Sources/shared_preferences_foundation/SharedPreferencesPlugin.swift"
+  : [1728173056, 958744070]
+  ? "/Users/jesuscervantescastro/.pub-cache/hosted/pub.dev/shared_preferences_foundation-2.5.3/darwin/shared_preferences_foundation/Sources/shared_preferences_foundation/messages.g.swift"
+  : [1728173056, 960371104]

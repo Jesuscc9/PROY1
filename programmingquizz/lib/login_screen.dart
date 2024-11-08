@@ -22,8 +22,26 @@ class _LoginScreenState extends State<LoginScreen> {
   void _validateEmail() {
     setState(() {
       final email = _emailController.text.trim();
-      if (email.isEmpty || !email.contains('@')) {
+      final domainWhitelist = [
+        'gmail.com',
+        'yahoo.com',
+        'outlook.com',
+        'hotmail.com',
+        'icloud.com',
+        'uanl.edu.mx',
+        'itesm.mx',
+      ];
+
+      const emailPattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+      final emailRegExp = RegExp(emailPattern);
+      final domain = email.split('@').length > 1 ? email.split('@')[1] : '';
+
+      if (email.isEmpty) {
         _emailError = 'Ingresa un correo electrónico válido';
+      } else if (!emailRegExp.hasMatch(email)) {
+        _emailError = 'El formato de correo es incorrecto';
+      } else if (!domainWhitelist.contains(domain)) {
+        _emailError = 'Este dominio no es permitido';
       } else {
         _emailError = null;
       }
@@ -122,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 20),
                 const Center(
                   child: Text(
-                    'Iniciar Sesión',
+                    'Iniciar sesión',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -131,12 +149,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
+                const Text(
+                  'Correo electrónico',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
                 TextField(
                   controller: _emailController,
                   onChanged: (value) => _validateEmail(),
                   cursorColor: Colors.black,
                   decoration: InputDecoration(
-                    hintText: 'Correo Electrónico',
+                    hintText: 'ejemplo@dominio.com',
                     hintStyle: const TextStyle(color: Colors.grey),
                     filled: true,
                     fillColor: Colors.white,
@@ -160,13 +186,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 20),
+                const Text(
+                  'Contraseña',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
                 TextField(
                   controller: _passwordController,
                   onChanged: (value) => _validatePassword(),
                   cursorColor: Colors.black,
                   obscureText: !_showPassword,
                   decoration: InputDecoration(
-                    hintText: 'Contraseña',
+                    hintText: '******',
                     hintStyle: const TextStyle(color: Colors.grey),
                     filled: true,
                     fillColor: Colors.white,
@@ -244,7 +278,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     child: Text(
-                      _isLoading ? 'Cargando...' : 'Iniciar Sesión',
+                      _isLoading ? 'Cargando...' : 'Iniciar sesión',
                       style: const TextStyle(color: Colors.white),
                     ),
                   ),

@@ -1,0 +1,9 @@
+version: "Apple Swift version 5.9 (swiftlang-5.9.0.128.108 clang-1500.0.40.1)"
+options: "6e9a39e32fe23bc08c6b9b2e8d19157c97da1a36b5e8d5546caa8551e54373cb"
+build_start_time: [1730690347, 402410000]
+build_end_time: [1730690355, 815127000]
+inputs:
+  ? "/Users/jesuscervantescastro/.pub-cache/hosted/pub.dev/url_launcher_macos-3.2.1/macos/url_launcher_macos/Sources/url_launcher_macos/UrlLauncherPlugin.swift"
+  : [1728173056, 869657231]
+  ? "/Users/jesuscervantescastro/.pub-cache/hosted/pub.dev/url_launcher_macos-3.2.1/macos/url_launcher_macos/Sources/url_launcher_macos/messages.g.swift"
+  : [1728173056, 873143173]

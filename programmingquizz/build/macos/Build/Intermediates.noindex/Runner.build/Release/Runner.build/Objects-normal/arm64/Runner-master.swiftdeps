@@ -1,0 +1,10 @@
+version: "Apple Swift version 5.9 (swiftlang-5.9.0.128.108 clang-1500.0.40.1)"
+options: "0116c6ed3a5a146ec363e0741659912e0eb8d1e25aa5cd95869959abfdd3e170"
+build_start_time: [1730690383, 947650000]
+build_end_time: [1730690389, 518749000]
+inputs:
+  ? "/Users/jesuscervantescastro/Desktop/programming/PROY1/programmingquizz/build/macos/Build/Intermediates.noindex/Runner.build/Release/Runner.build/DerivedSources/GeneratedAssetSymbols.swift"
+  : [1730690383, 938088342]
+  "/Users/jesuscervantescastro/Desktop/programming/PROY1/programmingquizz/macos/Flutter/GeneratedPluginRegistrant.swift": [1730690337, 208650980]
+  "/Users/jesuscervantescastro/Desktop/programming/PROY1/programmingquizz/macos/Runner/AppDelegate.swift": [1722965461, 0]
+  "/Users/jesuscervantescastro/Desktop/programming/PROY1/programmingquizz/macos/Runner/MainFlutterWindow.swift": [1722965461, 0]

@@ -1,0 +1,96 @@
+{
+  "main_library": {
+    "exported_symbols": [
+      {
+        "data": {
+          "global": [
+            "_$s9app_links8AppLinksC6sharedAA0cD11MacosPluginCvgZ",
+            "_$s9app_links19AppLinksMacosPluginC10handleLink4linkySS_tF",
+            "_$s9app_links8AppLinksCMm",
+            "_$s9app_links19AppLinksMacosPluginC8onCancel13withArgumentsSo12FlutterErrorCSgypSg_tF",
+            "_$s9app_links19AppLinksMacosPluginCN",
+            "_$s9app_links19AppLinksMacosPluginC6handle_6resultySo17FlutterMethodCallC_yypSgctF",
+            "_$s9app_links8AppLinksCfD",
+            "_$s9app_links19AppLinksMacosPluginCMa",
+            "_$s9app_links19AppLinksMacosPluginC16getUniversalLinky10Foundation3URLVSgSo14NSUserActivityCFTq",
+            "_$s9app_links19AppLinksMacosPluginC8onListen13withArguments9eventSinkSo12FlutterErrorCSgypSg_yAJctF",
+            "_$s9app_links8AppLinksCMn",
+            "_$s9app_links19AppLinksMacosPluginC10latestLink33_2F6A495CB7B3DC128F1BE26EA969E861LLSSSgvpfi",
+            "_$s9app_links19AppLinksMacosPluginC8register4withySo07FlutterF9Registrar_p_tFZ",
+            "_$s9app_links8AppLinksCfd",
+            "_$s9app_links19AppLinksMacosPluginC10handleLink4linkySS_tFTq",
+            "_$s9app_links19AppLinksMacosPluginC16getUniversalLinky10Foundation3URLVSgSo14NSUserActivityCF",
+            "_$s9app_links19AppLinksMacosPluginC15initialLinkSent33_2F6A495CB7B3DC128F1BE26EA969E861LLSbvpfi",
+            "_$s9app_links8AppLinksCMa",
+            "_$s9app_links19AppLinksMacosPluginCMn",
+            "_$s9app_links19AppLinksMacosPluginCfD",
+            "_app_linksVersionString",
+            "_$s9app_links19AppLinksMacosPluginC8onCancel13withArgumentsSo12FlutterErrorCSgypSg_tFTq",
+            "_$s9app_links19AppLinksMacosPluginCACycfc",
+            "_$s9app_links19AppLinksMacosPluginC8onListen13withArguments9eventSinkSo12FlutterErrorCSgypSg_yAJctFTq",
+            "_$s9app_links19AppLinksMacosPluginC9eventSink33_2F6A495CB7B3DC128F1BE26EA969E861LLyypSgcSgvpfi",
+            "_$s9app_links19AppLinksMacosPluginC25handleWillFinishLaunchingyy10Foundation12NotificationVF",
+            "_$s9app_links8AppLinksC6sharedAA0cD11MacosPluginCvau",
+            "_$s9app_links19AppLinksMacosPluginCACycfC",
+            "_$s9app_links8AppLinksC6sharedAA0cD11MacosPluginCvpZ",
+            "_$s9app_links8AppLinksCN",
+            "_$s9app_links19AppLinksMacosPluginC25handleWillFinishLaunchingyy10Foundation12NotificationVFTq",
+            "_$s9app_links19AppLinksMacosPluginC6handle_6resultySo17FlutterMethodCallC_yypSgctFTq",
+            "_$s9app_links19AppLinksMacosPluginC11initialLink33_2F6A495CB7B3DC128F1BE26EA969E861LLSSSgvpfi",
+            "_app_linksVersionNumber"
+          ],
+          "objc_class": [
+            "PodsDummy_app_links",
+            "_TtC9app_links19AppLinksMacosPlugin"
+          ]
+        }
+      },
+      {
+        "data": {
+          "global": [
+            "_Swift50Overrides",
+            "_Swift51Overrides"
+          ]
+        },
+        "targets": [
+          "x86_64-macos"
+        ],
+        "text": {
+          "global": [
+            "__ZN5swift34swift50override_conformsToProtocolEPKNS_14TargetMetadataINS_9InProcessEEEPKNS_24TargetProtocolDescriptorIS1_EEPFPKNS_18TargetWitnessTableIS1_EES4_S8_E",
+            "__ZN5swift39swift51override_conformsToSwiftProtocolEPKNS_14TargetMetadataINS_9InProcessEEEPKNS_24TargetProtocolDescriptorIS1_EEN7__swift9__runtime4llvm9StringRefEPFPKNS_35TargetProtocolConformanceDescriptorIS1_EES4_S8_SC_E",
+            "__Z34_swiftoverride_class_getSuperclassPKN5swift14TargetMetadataINS_9InProcessEEE"
+          ]
+        }
+      }
+    ],
+    "flags": [
+      {
+        "attributes": [
+          "not_app_extension_safe"
+        ]
+      }
+    ],
+    "install_names": [
+      {
+        "name": "@rpath/app_links.framework/Versions/A/app_links"
+      }
+    ],
+    "swift_abi": [
+      {
+        "abi": 7
+      }
+    ],
+    "target_info": [
+      {
+        "min_deployment": "10.14",
+        "target": "x86_64-macos"
+      },
+      {
+        "min_deployment": "11",
+        "target": "arm64-macos"
+      }
+    ]
+  },
+  "tapi_tbd_version": 5
+}

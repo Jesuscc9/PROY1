@@ -251,7 +251,7 @@ class _QuizPageState extends State<QuizPage> {
       return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.green,
-          title: const Text("Cargando Quiz"),
+          title: const Text("Cargando..."),
         ),
         body: const Center(child: CircularProgressIndicator()),
       );
@@ -311,19 +311,11 @@ class _QuizPageState extends State<QuizPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Pregunta:",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: Colors.green,
-              ),
-            ),
             const SizedBox(height: 8),
             Text(
               questionTitle.isEmpty ? 'Cargando pregunta...' : questionTitle,
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),

@@ -1,0 +1,20 @@
+---
+triple:          'x86_64-apple-darwin'
+binary-path:     '/Users/jesuscervantescastro/Desktop/programming/PROY1/programmingquizz/build/macos/Build/Products/Release/programmingquizz.app/Contents/MacOS/programmingquizz'
+relocations:
+  - { offsetInCU: 0x27, offset: 0xC99A9, size: 0x8, addend: 0x0, symName: '_$s16programmingquizz17MainFlutterWindowC12awakeFromNibyyFTo', symObjAddr: 0x0, symBinAddr: 0x100002460, symSize: 0xF0 }
+  - { offsetInCU: 0x87, offset: 0xC9A09, size: 0x8, addend: 0x0, symName: '_$s16programmingquizz17MainFlutterWindowC12awakeFromNibyyFTo', symObjAddr: 0x0, symBinAddr: 0x100002460, symSize: 0xF0 }
+  - { offsetInCU: 0x13E, offset: 0xC9AC0, size: 0x8, addend: 0x0, symName: '_$s16programmingquizz17MainFlutterWindowC11contentRect9styleMask7backing5deferACSo6CGRectV_So013NSWindowStyleH0VSo18NSBackingStoreTypeVSbtcfcTo', symObjAddr: 0xF0, symBinAddr: 0x100002550, symSize: 0x80 }
+  - { offsetInCU: 0x19E, offset: 0xC9B20, size: 0x8, addend: 0x0, symName: '_$s16programmingquizz17MainFlutterWindowCfD', symObjAddr: 0x170, symBinAddr: 0x1000025D0, symSize: 0x30 }
+  - { offsetInCU: 0x1DB, offset: 0xC9B5D, size: 0x8, addend: 0x0, symName: '_$s16programmingquizz17MainFlutterWindowCMa', symObjAddr: 0x1A0, symBinAddr: 0x100002600, symSize: 0x20 }
+  - { offsetInCU: 0x1EF, offset: 0xC9B71, size: 0x8, addend: 0x0, symName: '_$s16programmingquizz24RegisterGeneratedPlugins8registryySo21FlutterPluginRegistry_p_tFTf4e_nSo0F14ViewControllerC_Tg5', symObjAddr: 0x1C0, symBinAddr: 0x100002620, symSize: 0x1A6 }
+  - { offsetInCU: 0x27, offset: 0xC9E71, size: 0x8, addend: 0x0, symName: '_$s16programmingquizz11AppDelegateC47applicationShouldTerminateAfterLastWindowClosedySbSo13NSApplicationCFTo', symObjAddr: 0x0, symBinAddr: 0x1000027D0, symSize: 0x10 }
+  - { offsetInCU: 0x4B, offset: 0xC9E95, size: 0x8, addend: 0x0, symName: '_$s16programmingquizz11AppDelegateC47applicationShouldTerminateAfterLastWindowClosedySbSo13NSApplicationCFTo', symObjAddr: 0x0, symBinAddr: 0x1000027D0, symSize: 0x10 }
+  - { offsetInCU: 0x85, offset: 0xC9ECF, size: 0x8, addend: 0x0, symName: '_$s16programmingquizz11AppDelegateCACycfcTo', symObjAddr: 0x10, symBinAddr: 0x1000027E0, symSize: 0x30 }
+  - { offsetInCU: 0xC0, offset: 0xC9F0A, size: 0x8, addend: 0x0, symName: '_$s16programmingquizz11AppDelegateCfD', symObjAddr: 0x40, symBinAddr: 0x100002810, symSize: 0x30 }
+  - { offsetInCU: 0xFC, offset: 0xC9F46, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x70, symBinAddr: 0x100002840, symSize: 0x30 }
+  - { offsetInCU: 0x146, offset: 0xC9F90, size: 0x8, addend: 0x0, symName: '_$s16programmingquizz11AppDelegateCMa', symObjAddr: 0xA0, symBinAddr: 0x100002870, symSize: 0x14 }
+  - { offsetInCU: 0x2B, offset: 0xCA18F, size: 0x8, addend: 0x0, symName: '_$s16programmingquizz19ResourceBundleClass33_B883D80604144EF3DD0EAD42C3D5303ALLCfD', symObjAddr: 0x0, symBinAddr: 0x100002890, symSize: 0x20 }
+  - { offsetInCU: 0x55, offset: 0xCA1B9, size: 0x8, addend: 0x0, symName: '_$s16programmingquizz19ResourceBundleClass33_B883D80604144EF3DD0EAD42C3D5303ALLCfD', symObjAddr: 0x0, symBinAddr: 0x100002890, symSize: 0x20 }
+  - { offsetInCU: 0x84, offset: 0xCA1E8, size: 0x8, addend: 0x0, symName: '_$s16programmingquizz19ResourceBundleClass33_B883D80604144EF3DD0EAD42C3D5303ALLCMa', symObjAddr: 0x20, symBinAddr: 0x1000028B0, symSize: 0x14 }
+...
