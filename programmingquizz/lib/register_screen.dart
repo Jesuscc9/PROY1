@@ -22,14 +22,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? _emailError;
   String? _passwordError;
   String? _confirmPasswordError;
-  String? _errorMessage; // Variable para almacenar el mensaje de error
+  String? _errorMessage;
 
   final SupabaseClient _supabaseClient = Supabase.instance.client;
 
   void _validateUsername() {
     setState(() {
-      if (_usernameController.text.trim().length < 3) {
-        _usernameError = 'El nombre de usuario debe tener más de 3 caracteres';
+      final username = _usernameController.text.trim();
+      if (username.length < 3) {
+        _usernameError =
+            'El nombre de usuario debe tener al menos 3 caracteres';
+      } else if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(username)) {
+        _usernameError =
+            'El nombre de usuario solo puede contener letras, números y guiones bajos';
       } else {
         _usernameError = null;
       }
@@ -39,8 +44,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _validateEmail() {
     setState(() {
       final email = _emailController.text.trim();
-      if (email.isEmpty || !email.contains('@')) {
+      final domainWhitelist = [
+        'gmail.com',
+        'yahoo.com',
+        'outlook.com',
+        'hotmail.com',
+        'icloud.com',
+        'uanl.edu.mx',
+      ];
+
+      const emailPattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+      final emailRegExp = RegExp(emailPattern);
+      final domain = email.split('@').length > 1 ? email.split('@')[1] : '';
+
+      if (email.isEmpty) {
         _emailError = 'Ingresa un correo electrónico válido';
+      } else if (!emailRegExp.hasMatch(email)) {
+        _emailError = 'El formato de correo es incorrecto';
+      } else if (!domainWhitelist.contains(domain)) {
+        _emailError = 'Este dominio no es permitido';
       } else {
         _emailError = null;
       }
@@ -62,8 +84,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _register() async {
     _validateUsername();
-    _validatePasswords();
     _validateEmail();
+    _validatePasswords();
 
     if (_usernameError != null ||
         _passwordError != null ||
@@ -72,11 +94,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return; // Detener si hay errores
     }
 
-    FocusScope.of(context).unfocus();
-
     setState(() {
       _isLoading = true;
-      _errorMessage = null; // Reinicia el mensaje de error al registrar
+      _errorMessage = null;
     });
 
     try {
@@ -89,7 +109,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
       if (response.user != null) {
-        // Mostrar mensaje de éxito
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -105,7 +124,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           _isLoading = false;
         });
 
-        // Pausa antes de redirigir al usuario
         await Future.delayed(const Duration(seconds: 3));
         Navigator.pushReplacementNamed(context, '/confirm-mail');
       } else {
@@ -115,8 +133,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     } catch (error) {
       setState(() {
-        _errorMessage =
-            error.toString(); // Captura y muestra el error de Supabase
+        _errorMessage = error.toString();
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -172,40 +189,57 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
+                const Text(
+                  'Correo electrónico',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
                 TextField(
                   controller: _emailController,
                   onChanged: (value) => _validateEmail(),
                   cursorColor: Colors.black,
                   decoration: InputDecoration(
-                      hintText: 'Correo Electrónico',
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      errorText: _emailError,
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
-                        borderSide: BorderSide(color: Colors.grey),
-                      ),
-                      enabledBorder: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
-                        borderSide: BorderSide(color: Colors.grey),
-                      ),
-                      focusedBorder: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
-                        borderSide: BorderSide(color: Color(0xFF004D00)),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20.0, vertical: 18.0)),
+                    hintText: 'ejemplo@dominio.com',
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    errorText: _emailError,
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                      borderSide: BorderSide(color: Colors.grey),
+                    ),
+                    enabledBorder: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                      borderSide: BorderSide(color: Colors.grey),
+                    ),
+                    focusedBorder: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                      borderSide: BorderSide(color: Color(0xFF004D00)),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20.0, vertical: 18.0),
+                  ),
                   style: const TextStyle(color: Colors.black),
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 20),
+                const Text(
+                  'Nombre de usuario',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
                 TextField(
                   controller: _usernameController,
                   onChanged: (value) => _validateUsername(),
                   cursorColor: Colors.black,
                   decoration: InputDecoration(
-                    hintText: 'Nombre de Usuario',
+                    hintText: 'Usuario123',
                     hintStyle: const TextStyle(color: Colors.grey),
                     errorText: _usernameError,
                     filled: true,
@@ -228,13 +262,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: const TextStyle(color: Colors.black),
                 ),
                 const SizedBox(height: 20),
+                const Text(
+                  'Contraseña',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
                 TextField(
                   controller: _passwordController,
                   onChanged: (value) => _validatePasswords(),
                   cursorColor: Colors.black,
                   obscureText: !_showPassword,
                   decoration: InputDecoration(
-                    hintText: 'Contraseña',
+                    hintText: '******',
                     hintStyle: const TextStyle(color: Colors.grey),
                     errorText: _passwordError,
                     filled: true,
@@ -268,13 +310,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: const TextStyle(color: Colors.black),
                 ),
                 const SizedBox(height: 20),
+                const Text(
+                  'Confirmar contraseña',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
                 TextField(
                   controller: _confirmPasswordController,
                   onChanged: (value) => _validatePasswords(),
                   cursorColor: Colors.black,
                   obscureText: !_showConfirmPassword,
                   decoration: InputDecoration(
-                    hintText: 'Confirmar Contraseña',
+                    hintText: '******',
                     hintStyle: const TextStyle(color: Colors.grey),
                     errorText: _confirmPasswordError,
                     filled: true,
@@ -309,8 +359,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   style: const TextStyle(color: Colors.black),
                 ),
-                if (_errorMessage !=
-                    null) // Mostrar el mensaje de error si existe
+                if (_errorMessage != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Container(
@@ -329,7 +378,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               _errorMessage!,
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 16, // Tamaño de fuente más grande
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -338,8 +387,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                   ),
-                if (_errorMessage == null) const SizedBox(height: 36),
-                const SizedBox(height: 30),
+                const SizedBox(height: 36),
                 Center(
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _register,

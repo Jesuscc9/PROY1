@@ -2,34 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:programmingquizz/quiz_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class QuizListPage extends StatefulWidget {
-  const QuizListPage({super.key});
+class QuizzesListScreen extends StatefulWidget {
+  final String topicTitle;
+
+  const QuizzesListScreen({super.key, required this.topicTitle});
 
   @override
-  _QuizListPageState createState() => _QuizListPageState();
+  _QuizzesListScreenState createState() => _QuizzesListScreenState();
 }
 
-class _QuizListPageState extends State<QuizListPage> {
+class _QuizzesListScreenState extends State<QuizzesListScreen> {
   final SupabaseClient supabase = Supabase.instance.client;
-  Map<String, List<Map<String, dynamic>>> quizzesByTopic = {};
+  List<Map<String, dynamic>> quizzes = [];
   final int maxAttempts = 3;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchQuizzes();
+    _fetchQuizzesForTopic();
   }
 
-  Future<void> fetchQuizzes() async {
+  Future<void> _fetchQuizzesForTopic() async {
     try {
-      // Obtener la lista de quizzes y sus temas, incluyendo `topic_id` y `title` del tema
-      final quizzesResponse = await supabase
-          .from('quizzes')
-          .select('*, questions(*, topics(*))')
-          .eq('reviewed', true);
-
-      // Log de depuración para ver la estructura de datos
-
       final user = supabase.auth.currentUser;
       if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -38,57 +33,60 @@ class _QuizListPageState extends State<QuizListPage> {
         return;
       }
 
-      // Obtener los intentos del usuario para cada quiz
+      final quizzesResponse = await supabase
+          .from('quizzes')
+          .select('id, code, instruction, correct_code, questions(topic_id)')
+          .eq('reviewed', true);
+
+      final List<Map<String, dynamic>> quizzesForTopic = [];
+      for (var quiz in quizzesResponse) {
+        final topic = quiz['questions'][0]['topic_id'];
+        final topicResponse = await supabase
+            .from('topics')
+            .select('title')
+            .eq('id', topic)
+            .single();
+
+        if (topicResponse['title'] == widget.topicTitle) {
+          quizzesForTopic.add(quiz);
+        }
+      }
+
       final attemptsResponse = await supabase
           .from('user_progress')
           .select('quiz_id, score')
           .eq('user_id', user.id);
 
-      print("Attempts response: $attemptsResponse");
+      final completedQuizIds = attemptsResponse
+          .where((attempt) => attempt['score'] == true)
+          .map((attempt) => attempt['quiz_id'])
+          .toSet();
 
-      // Procesar los resultados
-      Map<String, List<Map<String, dynamic>>> groupedQuizzes = {};
+      final updatedQuizzes = quizzesForTopic.map((quiz) {
+        final attemptsCount = attemptsResponse
+            .where((attempt) => attempt['quiz_id'] == quiz['id'])
+            .length;
+        final isCompleted = completedQuizIds.contains(quiz['id']);
 
-      print("antes de entrar al for");
-      for (var quiz in quizzesResponse) {
-        print("Dentro del for");
-        print(quiz);
-        // Verificar si los datos están correctamente estructurados antes de acceder
-        if (quiz['questions'] == null ||
-            quiz['questions'][0]['topics'] == null ||
-            quiz['questions'][0]['topic_id'] == null ||
-            quiz['questions'][0]['topics']['title'] == null) {
-          print("Estructura inesperada para el quiz");
-          continue; // Saltar este quiz si no tiene la estructura esperada
-        }
-
-        print("antes de entrar al if");
-        final topicTitle = quiz['questions'][0]['topics']['title'] as String;
-        final attemptsForQuiz = attemptsResponse
-            .where((attempt) => attempt['quiz_id'] == quiz['id'] as int)
-            .toList();
-        final attemptsCount = attemptsForQuiz.length;
-        final isCompleted =
-            attemptsForQuiz.any((attempt) => attempt['score'] == true);
-
-        // Crear una lista de quizzes agrupada por tema
-        if (!groupedQuizzes.containsKey(topicTitle)) {
-          groupedQuizzes[topicTitle] = [];
-        }
-        groupedQuizzes[topicTitle]!.add({
+        return {
           ...quiz,
           'attempts': attemptsCount,
           'isCompleted': isCompleted,
+        };
+      }).toList();
+
+      if (mounted) {
+        setState(() {
+          quizzes = updatedQuizzes;
+          isLoading = false;
         });
       }
-
-      setState(() {
-        quizzesByTopic = groupedQuizzes;
-      });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al cargar quizzes: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al cargar quizzes: $e')),
+        );
+      }
     }
   }
 
@@ -117,101 +115,82 @@ class _QuizListPageState extends State<QuizListPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
-        title: const Text(
-          'Lista de Quizzes',
-          style: TextStyle(color: Colors.white),
+        title: Text(
+          widget.topicTitle,
+          style: const TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: quizzesByTopic.isEmpty
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              children: quizzesByTopic.entries.map((entry) {
-                final topicTitle = entry.key;
-                final quizzes = entry.value;
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: quizzes.length,
+              itemBuilder: (context, index) {
+                final quiz = quizzes[index];
+                final attempts = quiz['attempts'] as int;
+                final isCompleted = quiz['isCompleted'] as bool;
+                final cardColor = getCardColor(attempts, isCompleted);
+                final statusIcon = getStatusIcon(attempts, isCompleted);
 
-                return Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text(
-                          topicTitle,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                return Card(
+                  color: cardColor,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
+                    leading: statusIcon,
+                    title: Text(
+                      quiz['instruction'] ?? 'Título no disponible',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (!isCompleted && attempts < maxAttempts) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            'Intentos restantes: ${maxAttempts - attempts}',
+                            style: TextStyle(
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 4),
+                        LinearProgressIndicator(
+                          value: attempts / maxAttempts,
+                          backgroundColor: Colors.grey[300],
+                          color: isCompleted
+                              ? Colors.green[700]
+                              : (attempts >= maxAttempts
+                                  ? Colors.red[700]
+                                  : Colors.amber[700]),
+                        ),
+                      ],
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_ios,
+                        color: Colors.black54),
+                    onTap: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QuizPage(
+                            quizId: quiz['id'].toString(),
                           ),
                         ),
-                      ),
-                      ...quizzes.map((quiz) {
-                        final attempts = quiz['attempts'] as int;
-                        final isCompleted = quiz['isCompleted'] as bool;
-                        final cardColor = getCardColor(attempts, isCompleted);
-                        final statusIcon = getStatusIcon(attempts, isCompleted);
+                      );
 
-                        return Card(
-                          color: cardColor,
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: ListTile(
-                            leading: statusIcon,
-                            title: Text(
-                              quiz['instruction'],
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Intentos: $attempts / $maxAttempts',
-                                  style: TextStyle(
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                // Barra de progreso visual para intentos
-                                LinearProgressIndicator(
-                                  value: attempts / maxAttempts,
-                                  backgroundColor: Colors.grey[300],
-                                  color: isCompleted
-                                      ? Colors.green[700]
-                                      : (attempts >= maxAttempts
-                                          ? Colors.red[700]
-                                          : Colors.amber[700]),
-                                ),
-                              ],
-                            ),
-                            trailing: const Icon(Icons.arrow_forward_ios,
-                                color: Colors.black54),
-                            onTap: () async {
-                              final result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => QuizPage(
-                                    quizId: quiz['id'].toString(),
-                                  ),
-                                ),
-                              );
-
-                              await fetchQuizzes();
-                            },
-                          ),
-                        );
-                      }),
-                    ],
+                      if (mounted) {
+                        _fetchQuizzesForTopic();
+                      }
+                    },
                   ),
                 );
-              }).toList(),
+              },
             ),
     );
   }

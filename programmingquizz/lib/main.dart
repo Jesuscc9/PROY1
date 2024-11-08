@@ -45,7 +45,6 @@ class MyApp extends StatelessWidget {
         '/register': (context) => const RegisterScreen(),
         '/menu': (context) => const QuizzesMenuScreen(),
         '/confirm-mail': (context) => const ConfirmMailScreen(),
-        '/quizzes-list': (context) => const QuizListPage(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/quiz') {
@@ -121,7 +120,7 @@ class MainPage extends StatelessWidget {
               const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text(
-                  'FIMEQUIZZ', // Título grande
+                  'FIMEQUIZ', // Título grande
                   style: TextStyle(
                     fontSize: 46,
                     color: Color(0xFF006633),
@@ -170,7 +169,7 @@ class MainPage extends StatelessWidget {
                   );
                 },
                 child: const Text(
-                  'Iniciar Sesión',
+                  'Iniciar sesión',
                   style: TextStyle(fontSize: 18),
                 ),
               ),
