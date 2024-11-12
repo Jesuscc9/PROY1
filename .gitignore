@@ -6,6 +6,7 @@ programmingquizz/.packages
 programmingquizz/.pub-cache/
 programmingquizz/.pub/
 programmingquizz/.melos_tool/
+programmingquizz/build
 
 # Web related
 programmingquizz/web/.sass-cache/
