@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'quizzes_list_screen.dart'; // Asegúrate de importar la pantalla de quizzes específicos
+import 'quizzes_list_screen.dart';
 
 class QuizzesByTopicScreen extends StatefulWidget {
   const QuizzesByTopicScreen({super.key});
@@ -13,11 +13,22 @@ class _QuizzesByTopicScreenState extends State<QuizzesByTopicScreen> {
   final SupabaseClient supabase = Supabase.instance.client;
   Map<String, Map<String, int>> topicCompletionData = {};
   bool isLoading = true;
+  bool isAdmin = false;
 
   @override
   void initState() {
     super.initState();
+    _fetchUserInfo();
     _fetchTopicCompletionData();
+  }
+
+  Future<void> _fetchUserInfo() async {
+    final user = supabase.auth.currentUser;
+    if (user != null && user.email == 'adminfimequiz@gmail.com') {
+      setState(() {
+        isAdmin = true;
+      });
+    }
   }
 
   Future<void> _fetchTopicCompletionData() async {
@@ -106,7 +117,6 @@ class _QuizzesByTopicScreenState extends State<QuizzesByTopicScreen> {
 
                 return GestureDetector(
                   onTap: () async {
-                    // Navegar a la pantalla de quizzes específicos y esperar hasta que regrese
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -114,8 +124,6 @@ class _QuizzesByTopicScreenState extends State<QuizzesByTopicScreen> {
                             QuizzesListScreen(topicTitle: topic),
                       ),
                     );
-
-                    // Volver a llamar a _fetchTopicCompletionData al regresar
                     _fetchTopicCompletionData();
                   },
                   child: Padding(
@@ -136,37 +144,37 @@ class _QuizzesByTopicScreenState extends State<QuizzesByTopicScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                topic,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF006135),
-                                ),
-                              ),
-                              Text(
-                                '$completedQuizzes/$totalQuizzes',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF46BC6E),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(5),
-                            child: LinearProgressIndicator(
-                              value: completedQuizzes / totalQuizzes,
-                              backgroundColor: Colors.grey[300],
-                              color: const Color(0xFF46BC6E),
-                              minHeight: 8,
+                          Text(
+                            topic,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF006135),
                             ),
                           ),
+                          const SizedBox(height: 5),
+                          Text(
+                            isAdmin
+                                ? '$totalQuizzes quizzes'
+                                : '$completedQuizzes/$totalQuizzes completados',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF46BC6E),
+                            ),
+                          ),
+                          if (!isAdmin) ...[
+                            const SizedBox(height: 10),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(5),
+                              child: LinearProgressIndicator(
+                                value: completedQuizzes / totalQuizzes,
+                                backgroundColor: Colors.grey[300],
+                                color: const Color(0xFF46BC6E),
+                                minHeight: 8,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),

@@ -138,12 +138,12 @@ class _QuizzesMenuScreenState extends State<QuizzesMenuScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => const AllQuizzesScreen(),
-                    //   ),
-                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const QuizzesByTopicScreen(),
+                      ),
+                    );
                   },
                   label: const Text(
                     'Ver todos los quizes',

@@ -1,8 +1,10 @@
+import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:math';
+import 'package:http/http.dart' as http;
 
 class PreviewQuiz extends StatefulWidget {
   final int? quizId; // Nullable to allow empty state for new quizzes
@@ -17,23 +19,29 @@ class _PreviewQuizState extends State<PreviewQuiz> {
 
   late TextEditingController _codeController;
   late TextEditingController _instructionController;
-  late TextEditingController _correctExplanationController;
   bool isEditingCode = false;
   List<Map<String, dynamic>> options = [];
   String correctOptionKey = 'A';
   bool isLoading = true;
+  int? quizId; // Variable para almacenar el quizId, sea pasado o generado
+  int? topicId; // Variable para almacenar el topicId
+  String? topicTitle;
 
   @override
   void initState() {
     super.initState();
-    if (widget.quizId == null) {
+    quizId = widget.quizId; // Asignar el quizId si se pasó
+    if (quizId == null) {
       _generateRandomQuiz();
     } else {
-      _fetchQuizData(widget.quizId!);
+      _fetchQuizData(quizId!);
     }
   }
 
   Future<void> _generateRandomQuiz() async {
+    setState(() {
+      isLoading = true; // Mostrar el indicador de carga
+    });
     try {
       // Retrieve all non-reviewed quizzes
       final quizResponse =
@@ -50,15 +58,43 @@ class _PreviewQuizState extends State<PreviewQuiz> {
 
       // Select a random quiz from the list
       final randomQuiz = quizResponse[Random().nextInt(quizResponse.length)];
-      final quizId = randomQuiz['id'];
+      quizId = randomQuiz['id']; // Almacena el quizId generado aleatoriamente
+      print("Generated quiz ID: $quizId");
 
-      // Set the selected quiz as reviewed
-      await supabase
-          .from('quizzes')
-          .update({'reviewed': true}).eq('id', quizId);
+      // Check if random quiz has a question
+      final questionResponse = await supabase
+          .from('questions')
+          .select('id')
+          .eq('quiz_id', quizId as Object)
+          .limit(1)
+          .maybeSingle();
+
+      if (questionResponse?['id'] == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('El quiz seleccionado no tiene una pregunta')),
+        );
+        _initializeEmptyFields();
+        return;
+      }
+
+      // Check if random quiz has 4 options
+      final optionsResponse = await supabase
+          .from('options')
+          .select('id, content, key')
+          .eq('question_id', questionResponse?['id']);
+
+      if (optionsResponse.length != 4) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('El quiz seleccionado no tiene 4 opciones')),
+        );
+        _initializeEmptyFields();
+        return;
+      }
 
       // Load the selected quiz data
-      await _fetchQuizData(quizId);
+      await _fetchQuizData(quizId!);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al generar con IA: $e')),
@@ -76,30 +112,32 @@ class _PreviewQuizState extends State<PreviewQuiz> {
           .eq('id', quizId)
           .maybeSingle();
 
+      // Fetch correct option explanation from questions table
+      final questionResponse = await supabase
+          .from('questions')
+          .select('id, correct_option_explanation, topic_id, topics (*)')
+          .eq('quiz_id', quizId)
+          .limit(1)
+          .maybeSingle();
+
+      topicTitle = questionResponse?['topics']['title'];
+
       // Fetch options for the quiz
       final optionsResponse = await supabase
           .from('options')
           .select('id, content, key')
-          .eq('question_id', quizId);
+          .eq('question_id', questionResponse?['id']);
 
       final List<Map<String, dynamic>> optionsData =
           List<Map<String, dynamic>>.from(optionsResponse ?? []);
 
-      // Fetch correct option explanation from questions table
-      final questionResponse = await supabase
-          .from('questions')
-          .select('correct_option_explanation')
-          .eq('quiz_id', quizId)
-          .maybeSingle();
+      topicId = questionResponse?['topic_id'];
 
       setState(() {
         _codeController =
             TextEditingController(text: quizResponse?['code'] ?? '');
         _instructionController =
             TextEditingController(text: quizResponse?['instruction'] ?? '');
-        _correctExplanationController = TextEditingController(
-          text: questionResponse?['correct_option_explanation'] ?? '',
-        );
         options = optionsData;
         isLoading = false;
       });
@@ -115,85 +153,42 @@ class _PreviewQuizState extends State<PreviewQuiz> {
     setState(() {
       _codeController = TextEditingController(text: '');
       _instructionController = TextEditingController(text: '');
-      _correctExplanationController = TextEditingController(text: '');
       options = [];
       isLoading = false;
     });
   }
 
   Future<void> _updateQuiz() async {
-    // Ensure quizId is not null before proceeding
-    if (widget.quizId == null) {
+    // Asegúrate de que quizId no sea nulo antes de proceder
+    if (quizId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Quiz ID no puede ser nulo')),
       );
       return;
     }
+
     try {
-      // Actualizar los datos principales del quiz
-      final quizUpdateResponse = await supabase.from('quizzes').update({
-        'code': _codeController.text,
-        'instruction': _instructionController.text,
-      }).eq('id', widget.quizId!);
+      final payload = {
+        "quiz_id": quizId,
+        "code": _codeController.text,
+        "instruction": _instructionController.text,
+        "correct_code": _codeController.text,
+        "correct_option_key": correctOptionKey,
+        "topic_id": topicId,
+        "options": options
+            .map((option) =>
+                {"key": option['key'], "content": option['content']})
+            .toList(),
+      };
 
-      if (quizUpdateResponse.hasError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'Error al actualizar el quiz: ${quizUpdateResponse.error.message}')),
-        );
-        return;
-      }
-
-      // Actualizar la explicación correcta en la tabla questions
-      final questionUpdateResponse = await supabase.from('questions').update({
-        'correct_option_explanation': _correctExplanationController.text
-      }).eq('quiz_id', widget.quizId!);
-
-      if (questionUpdateResponse.hasError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'Error al actualizar la explicación: ${questionUpdateResponse.error.message}')),
-        );
-        return;
-      }
-
-      // Actualizar cada opción en la tabla options
-      for (var option in options) {
-        final optionUpdateResponse = await supabase
-            .from('options')
-            .update({'content': option['content']}).eq('id', option['id']);
-
-        if (optionUpdateResponse.hasError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text(
-                    'Error al actualizar opción ${option['key']}: ${optionUpdateResponse.error.message}')),
-          );
-          return;
-        }
-      }
-
-      // Marcar el quiz como revisado
-      final reviewedUpdateResponse = await supabase
-          .from('quizzes')
-          .update({'reviewed': true}).eq('id', widget.quizId!);
-
-      if (reviewedUpdateResponse.hasError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'Error al marcar como revisado: ${reviewedUpdateResponse.error.message}')),
-        );
-        return;
-      }
+      final data = await supabase.functions
+          .invoke('updateQuizData', body: payload, method: HttpMethod.post);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content:
-                Text('Quiz actualizado exitosamente y marcado como revisado')),
+        const SnackBar(content: Text('Quiz agregado exitosamente.')),
       );
+      Navigator.of(context)
+          .pushReplacementNamed('/menu'); // Redirigir a MenuPage
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error inesperado: $e')),
@@ -316,7 +311,12 @@ class _PreviewQuizState extends State<PreviewQuiz> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
+            Text(
+              "Tema: ${topicTitle ?? 'No asignado'}",
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
             TextField(
               controller: _instructionController,
               decoration: InputDecoration(
@@ -348,22 +348,44 @@ class _PreviewQuizState extends State<PreviewQuiz> {
             const SizedBox(height: 8),
             _buildOptionsEditor(),
             const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _updateQuiz,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  backgroundColor: Colors.green,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+            Column(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _updateQuiz,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      "Aceptar",
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
                   ),
                 ),
-                child: const Text(
-                  "Aceptar",
-                  style: TextStyle(color: Colors.white, fontSize: 18),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _generateRandomQuiz,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      backgroundColor: Colors.grey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      "Generar otra vez",
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ],
         ),

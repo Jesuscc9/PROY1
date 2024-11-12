@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:programmingquizz/quiz_page.dart';
+import 'package:programmingquizz/preview_quiz.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class QuizzesListScreen extends StatefulWidget {
@@ -16,11 +17,22 @@ class _QuizzesListScreenState extends State<QuizzesListScreen> {
   List<Map<String, dynamic>> quizzes = [];
   final int maxAttempts = 3;
   bool isLoading = true;
+  bool isAdmin = false;
 
   @override
   void initState() {
     super.initState();
+    _fetchUserInfo();
     _fetchQuizzesForTopic();
+  }
+
+  Future<void> _fetchUserInfo() async {
+    final user = supabase.auth.currentUser;
+    if (user != null && user.email == 'adminfimequiz@gmail.com') {
+      setState(() {
+        isAdmin = true;
+      });
+    }
   }
 
   Future<void> _fetchQuizzesForTopic() async {
@@ -90,18 +102,10 @@ class _QuizzesListScreenState extends State<QuizzesListScreen> {
     }
   }
 
-  Color getCardColor(int attempts, bool isCompleted) {
-    if (isCompleted) {
-      return Colors.green[200]!;
-    } else if (attempts >= maxAttempts) {
-      return Colors.red[200]!;
-    } else {
-      return Colors.grey[300]!;
-    }
-  }
-
   Icon getStatusIcon(int attempts, bool isCompleted) {
-    if (isCompleted) {
+    if (isAdmin) {
+      return const Icon(Icons.edit, color: Color(0xFF006135));
+    } else if (isCompleted) {
       return Icon(Icons.check_circle, color: Colors.green[700]);
     } else if (attempts >= maxAttempts) {
       return Icon(Icons.cancel, color: Colors.red[700]);
@@ -130,11 +134,11 @@ class _QuizzesListScreenState extends State<QuizzesListScreen> {
                 final quiz = quizzes[index];
                 final attempts = quiz['attempts'] as int;
                 final isCompleted = quiz['isCompleted'] as bool;
-                final cardColor = getCardColor(attempts, isCompleted);
                 final statusIcon = getStatusIcon(attempts, isCompleted);
 
                 return Card(
-                  color: cardColor,
+                  color: Colors
+                      .white, // Conservamos el fondo blanco predeterminado
                   margin: const EdgeInsets.symmetric(vertical: 8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -151,38 +155,52 @@ class _QuizzesListScreenState extends State<QuizzesListScreen> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (!isCompleted && attempts < maxAttempts) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            'Intentos restantes: ${maxAttempts - attempts}',
-                            style: TextStyle(
-                              color: Colors.grey[700],
+                        if (!isAdmin && !isCompleted && attempts < maxAttempts)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child: Text(
+                              'Intentos restantes: ${maxAttempts - attempts}',
+                              style: TextStyle(color: Colors.grey[700]),
                             ),
                           ),
-                        ],
-                        const SizedBox(height: 4),
-                        LinearProgressIndicator(
-                          value: attempts / maxAttempts,
-                          backgroundColor: Colors.grey[300],
-                          color: isCompleted
-                              ? Colors.green[700]
-                              : (attempts >= maxAttempts
-                                  ? Colors.red[700]
-                                  : Colors.amber[700]),
-                        ),
+                        if (!isAdmin)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child: LinearProgressIndicator(
+                              value: attempts / maxAttempts,
+                              backgroundColor: Colors.grey[300],
+                              color: isCompleted
+                                  ? Colors.green[700]
+                                  : (attempts >= maxAttempts
+                                      ? Colors.red[700]
+                                      : Colors.amber[700]),
+                            ),
+                          ),
                       ],
                     ),
                     trailing: const Icon(Icons.arrow_forward_ios,
                         color: Colors.black54),
                     onTap: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => QuizPage(
-                            quizId: quiz['id'].toString(),
+                      if (isAdmin) {
+                        // Navegar a la pantalla de edición para el administrador
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                PreviewQuiz(quizId: quiz['id']),
                           ),
-                        ),
-                      );
+                        );
+                      } else {
+                        // Navegar a la página de quiz normal para usuarios no administradores
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QuizPage(
+                              quizId: quiz['id'].toString(),
+                            ),
+                          ),
+                        );
+                      }
 
                       if (mounted) {
                         _fetchQuizzesForTopic();
